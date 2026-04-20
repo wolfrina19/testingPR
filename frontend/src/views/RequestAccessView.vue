@@ -64,7 +64,7 @@ const handleSubmit = async () => {
     console.log('Access request form:', { ...form })
 
     successMessage.value =
-      'Votre demande a été préparée. Le backend n’est pas encore branché.'
+      'Votre demande a été préparée. Le backend n\'est pas encore branché.'
   } catch (error) {
     errorMessage.value =
       error?.response?.data?.message || "Impossible d'envoyer la demande."
@@ -116,7 +116,7 @@ const handleSubmit = async () => {
         <div class="auth-form-block">
           <h2>Rejoignez ValiDia</h2>
           <p class="subtitle">
-            Envoyez votre demande d’accès à notre plateforme
+            Envoyez votre demande d'accès à notre plateforme
           </p>
 
           <form class="auth-form" @submit.prevent="handleSubmit">
@@ -153,7 +153,7 @@ const handleSubmit = async () => {
             </div>
 
             <div class="form-group">
-              <label for="companyName">Nom de l’entreprise</label>
+              <label for="companyName">Nom de l'entreprise</label>
               <input
                 id="companyName"
                 v-model="form.companyName"
@@ -197,8 +197,8 @@ const handleSubmit = async () => {
             <div class="request-note">
               <p>
                 <strong>Note importante :</strong>
-                Votre demande sera validée par l’administration avant
-                l’activation de votre compte.
+                Votre demande sera validée par l'administration avant
+                l'activation de votre compte.
               </p>
             </div>
 

@@ -30,7 +30,7 @@ const handleLogin = async () => {
   }
 
   if (!isEmailValid.value) {
-    errorMessage.value = `L’adresse e-mail doit se terminer par @${allowedDomain}.`
+    errorMessage.value = `L\'adresse e-mail doit se terminer par @${allowedDomain}.`
     return
   }
 
@@ -97,7 +97,7 @@ const goToForgotPassword = () => {
         <div class="auth-tabs">
           <button class="tab active" type="button">Connexion</button>
           <button class="tab" type="button" @click="goToRequestAccess">
-            Demander l’accès
+            Demander l'accès
           </button>
         </div>
 
