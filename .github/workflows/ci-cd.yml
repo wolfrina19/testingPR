@@ -7,7 +7,7 @@ on:
       - 'backend-*'
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: write
 
 jobs:
@@ -17,24 +17,74 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Déterminer la branche cible
         id: target
         run: |
           if [[ "${GITHUB_REF_NAME}" == frontend-* ]]; then
-            echo "branch=frontend" >> $GITHUB_OUTPUT
+            echo "branch=frontend" >> "$GITHUB_OUTPUT"
           elif [[ "${GITHUB_REF_NAME}" == backend-* ]]; then
-            echo "branch=backend" >> $GITHUB_OUTPUT
+            echo "branch=backend" >> "$GITHUB_OUTPUT"
           else
-            echo "Unsupported branch"
+            echo "Unsupported branch: ${GITHUB_REF_NAME}"
             exit 1
           fi
 
-      - name: Create or update PR
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          base: ${{ steps.target.outputs.branch }}
-          branch: ${{ github.ref_name }}
-          title: "Auto PR: ${{ github.ref_name }} → ${{ steps.target.outputs.branch }}"
-          body: "PR automatique suite à un push"
+      - name: Logs de contexte
+        run: |
+          echo "Source branch: ${GITHUB_REF_NAME}"
+          echo "Target branch: ${{ steps.target.outputs.branch }}"
+          echo "Actor: ${GITHUB_ACTOR}"
+          git fetch --all --prune
+          echo "Remote branches:"
+          git branch -r
+          echo "Verify source/base exist remotely:"
+          git ls-remote --heads origin "${GITHUB_REF_NAME}" "${{ steps.target.outputs.branch }}"
+
+      - name: Vérifier qu'il y a un diff
+        run: |
+          git fetch origin "${GITHUB_REF_NAME}" "${{ steps.target.outputs.branch }}"
+          echo "Commits in source not in base:"
+          git log --oneline "origin/${{ steps.target.outputs.branch }}..origin/${GITHUB_REF_NAME}" || true
+          echo "Changed files:"
+          git diff --name-status "origin/${{ steps.target.outputs.branch }}...origin/${GITHUB_REF_NAME}" || true
+
+      - name: Vérifier s'il existe déjà une PR ouverte
+        id: existing
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(gh pr list \
+            --head "${GITHUB_REF_NAME}" \
+            --base "${{ steps.target.outputs.branch }}" \
+            --state open \
+            --json number \
+            --jq '.[0].number // empty')
+          echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          if [[ -n "$PR_NUMBER" ]]; then
+            echo "Open PR already exists: #$PR_NUMBER"
+          else
+            echo "No open PR found"
+          fi
+
+      - name: Créer la PR
+        if: steps.existing.outputs.number == ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base "${{ steps.target.outputs.branch }}" \
+            --head "${GITHUB_REF_NAME}" \
+            --title "Auto PR: ${GITHUB_REF_NAME} → ${{ steps.target.outputs.branch }}" \
+            --body "PR automatique suite à un push sur ${GITHUB_REF_NAME}"
+
+      - name: Afficher le résultat
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr list \
+            --head "${GITHUB_REF_NAME}" \
+            --base "${{ steps.target.outputs.branch }}" \
+            --state open
