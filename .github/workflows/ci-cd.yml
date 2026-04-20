@@ -1,0 +1,40 @@
+name: Auto PR
+
+on:
+  push:
+    branches:
+      - 'frontend-*'
+      - 'backend-*'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Déterminer la branche cible
+        id: target
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == frontend-* ]]; then
+            echo "branch=frontend" >> $GITHUB_OUTPUT
+          elif [[ "${GITHUB_REF_NAME}" == backend-* ]]; then
+            echo "branch=backend" >> $GITHUB_OUTPUT
+          else
+            echo "Unsupported branch"
+            exit 1
+          fi
+
+      - name: Create or update PR
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: ${{ steps.target.outputs.branch }}
+          branch: ${{ github.ref_name }}
+          title: "Auto PR: ${{ github.ref_name }} → ${{ steps.target.outputs.branch }}"
+          body: "PR automatique suite à un push"
