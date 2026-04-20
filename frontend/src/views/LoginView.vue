@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { loginRequest } from '../services/authService'
+import  AppLogo  from '../components/AppLogo.vue'
 import '../assets/styles/login.css'
 
 const router = useRouter()
@@ -69,10 +70,7 @@ const goToForgotPassword = () => {
   <div class="auth-page">
     <section class="auth-left">
       <div class="brand-block">
-        <div class="brand-logo-row">
-          <span class="brand-symbol">X</span>
-          <span class="brand-name">ValiDia</span>
-        </div>
+        <AppLogo />
 
         <div class="hero-text">
           <h1>

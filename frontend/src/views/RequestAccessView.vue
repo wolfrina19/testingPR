@@ -2,6 +2,7 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import '../assets/styles/request-access.css'
+import  AppLogo  from '../components/AppLogo.vue'
 
 const router = useRouter()
 
@@ -78,10 +79,7 @@ const handleSubmit = async () => {
     <section class="auth-left">
       <div class="brand-block">
         <div class="brand-logo-row">
-          <div class="brand-logo">
-            <span class="brand-symbol">X</span>
-          </div>
-          <span class="brand-name">ValiDia</span>
+            <AppLogo />
         </div>
 
         <div class="hero-text">
