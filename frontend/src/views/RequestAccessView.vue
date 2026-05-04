@@ -55,16 +55,16 @@ const handleSubmit = async () => {
 
   isSubmitting.value = true
 
-  try {
-    // TODO BACKEND:
-    // envoyer plus tard via Axios vers l’endpoint fourni par le backend
-    // ex:
-    // await requestAccess(form)
+  try { 
+    await requestAccess({
+      lastName: form.lastName,
+      firstName: form.firstName,
+      email: form.email,
+      companyName: form.companyName,
+      jobTitle: form.jobTitle,
+      password: form.password,
+    })
 
-    console.log('Access request form:', { ...form })
-
-    successMessage.value =
-      'Votre demande a été préparée. Le backend n\'est pas encore branché.'
   } catch (error) {
     errorMessage.value =
       error?.response?.data?.message || "Impossible d'envoyer la demande."
