@@ -14,7 +14,7 @@ const password = ref('')
 const errorMessage = ref('')
 const isLoading = ref(false)
 
-const allowedDomain = import.meta.env.VITE_ALLOWED_EMAIL_DOMAIN || 'ensa.ac.ma'
+const allowedDomain = import.meta.env.VITE_ALLOWED_EMAIL_DOMAIN || 'ensa.ac.ma' //check
 
 const isEmailValid = computed(() => {
   const regex = new RegExp(`^[a-zA-Z0-9._%+-]+@${allowedDomain.replace('.', '\\.')}$`)
@@ -42,7 +42,7 @@ const handleLogin = async () => {
       password: password.value,
     })
 
-    authStore.setAuthSession({
+    authStore.setAuthSession({ //check
       accessToken: data.accessToken,
       user: data.user,
     })
@@ -121,7 +121,7 @@ const goToForgotPassword = () => {
               <label for="password">Mot de passe</label>
               <input
                 id="password"
-                v-model="password"
+                v-model="password" 
                 type="password"
                 placeholder="••••••••"
                 autocomplete="current-password"
