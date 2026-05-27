@@ -1,9 +1,13 @@
 <script setup>
-import { reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import '../assets/styles/request-access.css'
 import  AppLogo  from '../components/AppLogo.vue'
 import { requestAccess } from '../services/requestAccessService'
+import {
+  addRecentAccessRequest,
+  getRecentAccessRequests,
+} from '../services/accessRequestHistoryService'
 
 const router = useRouter()
 
@@ -21,6 +25,7 @@ const form = reactive({
 const errorMessage = ref('')
 const successMessage = ref('')
 const isSubmitting = ref(false)
+const recentRequests = ref([])
 
 const goToLogin = () => {
   router.push('/login')
@@ -61,6 +66,10 @@ const validateForm = () => {
   return true
 }
 
+onMounted(() => {
+  recentRequests.value = getRecentAccessRequests()
+})
+
 const handleSubmit = async () => {
   if (!validateForm()) return
 
@@ -78,6 +87,12 @@ const handleSubmit = async () => {
 
     successMessage.value =
       "Votre demande a bien été envoyée. L'administration vous contactera après validation."
+    recentRequests.value = addRecentAccessRequest({
+      fullName: `${form.firstName.trim()} ${form.lastName.trim()}`,
+      email: form.email.trim().toLowerCase(),
+      companyName: form.companyName.trim(),
+      jobTitle: form.jobTitle.trim(),
+    })
     resetForm()
   } catch (error) {
     errorMessage.value =
@@ -228,6 +243,17 @@ const handleSubmit = async () => {
               {{ isSubmitting ? 'Envoi...' : 'Envoyer une demande' }}
             </button>
           </form>
+
+          <aside v-if="recentRequests.length" class="recent-requests">
+            <h3>Dernières demandes locales</h3>
+
+            <ul>
+              <li v-for="request in recentRequests" :key="request.id">
+                <span>{{ request.fullName }}</span>
+                <small>{{ request.jobTitle }} - {{ request.companyName }}</small>
+              </li>
+            </ul>
+          </aside>
         </div>
       </div>
     </section>
