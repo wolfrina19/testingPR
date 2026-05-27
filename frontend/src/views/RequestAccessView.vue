@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import '../assets/styles/request-access.css'
 import  AppLogo  from '../components/AppLogo.vue'
@@ -26,6 +26,22 @@ const errorMessage = ref('')
 const successMessage = ref('')
 const isSubmitting = ref(false)
 const recentRequests = ref([])
+
+const passwordStrength = computed(() => {
+  const password = form.password
+  let score = 0
+
+  if (password.length >= 8) score += 1
+  if (/[A-Z]/.test(password)) score += 1
+  if (/[0-9]/.test(password)) score += 1
+  if (/[^A-Za-z0-9]/.test(password)) score += 1
+
+  if (!password) return { label: '', className: '' }
+  if (score <= 1) return { label: 'Mot de passe faible', className: 'weak' }
+  if (score <= 3) return { label: 'Mot de passe moyen', className: 'medium' }
+
+  return { label: 'Mot de passe robuste', className: 'strong' }
+})
 
 const goToLogin = () => {
   router.push('/login')
@@ -210,6 +226,14 @@ const handleSubmit = async () => {
                   type="password"
                   placeholder="••••••••"
                 />
+
+                <p
+                  v-if="passwordStrength.label"
+                  class="password-strength"
+                  :class="passwordStrength.className"
+                >
+                  {{ passwordStrength.label }}
+                </p>
               </div>
 
               <div class="form-group password-group">

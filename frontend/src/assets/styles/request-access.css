@@ -34,6 +34,24 @@
   padding-right: 14px;
 }
 
+.password-strength {
+  margin: 8px 0 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.password-strength.weak {
+  color: #b04444;
+}
+
+.password-strength.medium {
+  color: #9a6417;
+}
+
+.password-strength.strong {
+  color: #2f6b4f;
+}
+
 .recent-requests {
   margin-top: 22px;
   padding-top: 18px;
