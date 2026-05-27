@@ -3,6 +3,7 @@ import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import '../assets/styles/request-access.css'
 import  AppLogo  from '../components/AppLogo.vue'
+import { requestAccess } from '../services/requestAccessService'
 
 const router = useRouter()
 
@@ -23,6 +24,16 @@ const isSubmitting = ref(false)
 
 const goToLogin = () => {
   router.push('/login')
+}
+
+const resetForm = () => {
+  form.lastName = ''
+  form.firstName = ''
+  form.email = ''
+  form.companyName = ''
+  form.jobTitle = ''
+  form.password = ''
+  form.passwordConfirmation = ''
 }
 
 const validateForm = () => {
@@ -57,14 +68,17 @@ const handleSubmit = async () => {
 
   try { 
     await requestAccess({
-      lastName: form.lastName,
-      firstName: form.firstName,
-      email: form.email,
-      companyName: form.companyName,
-      jobTitle: form.jobTitle,
+      lastName: form.lastName.trim(),
+      firstName: form.firstName.trim(),
+      email: form.email.trim().toLowerCase(),
+      companyName: form.companyName.trim(),
+      jobTitle: form.jobTitle.trim(),
       password: form.password,
     })
 
+    successMessage.value =
+      "Votre demande a bien été envoyée. L'administration vous contactera après validation."
+    resetForm()
   } catch (error) {
     errorMessage.value =
       error?.response?.data?.message || "Impossible d'envoyer la demande."
